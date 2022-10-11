@@ -1,0 +1,51 @@
+version: '3'
+services:
+  jpgs-cli-dev-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jpgs-cli-dev-server
+    container_name: jpgs-cli-dev-server
+    ports:
+      - 8081:7001
+  jpgs-cli-dev-mongo:
+    image: mongo
+    container_name: jpgs-cli-dev-mongo
+    restart: always
+    volumes:
+      # - '.docker-volumes/mongo/data:/data/db'
+      - '/Users/oreo/data/db:/data/db'
+    environment:
+      - MONGO_INITDB_DATABASE=jpgs-cli
+      - TZ=Asia/Shanghai
+    ports:
+      - '27016:27017'
+  jpgs-cli-dev-redis:
+    image: redis
+    container_name: jpgs-cli-dev-redis
+    ports:
+      - 6378:6379
+    environment:
+      - TZ=Asia/Shanghai
+  # jpgs-cli-dev-nginx:
+  #   image: nginx
+  #   container_name: jpgs-cli-dev-nginx
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  jpgs-cli-dev-mysql:
+    image: mysql
+    container_name: jpgs-cli-dev-mysql
+    restart: always
+    privileged: true
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - '.docker-volumes/mysql/log:/var/log/mysql' # 记录日志
+      - '.docker-volumes/mysql/data:/var/lib/mysql' # 数据持久化
+      - './mysql/init:/docker-entrypoint-initdb.d' # 初始化 sql
+    environment:
+      - MYSQL_DATABASE=jpgs_cli
+      - MYSQL_ROOT_PASSWORD=litang
+      - TZ=Asia/Shanghai
+    ports:
+      - '3305:3306'
